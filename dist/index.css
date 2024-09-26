@@ -40,12 +40,6 @@ body.in-game #game-canvas-wrapper {
   display: block;
 }
 
-.phone-warning {
-  font-size: 20px;
-  text-align: center;
-  padding: 20px;
-}
-
 /* General Site Style sTuff */
 .navbar-brand,
 .navbar-brand:hover,

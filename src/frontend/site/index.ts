@@ -14,7 +14,6 @@ class Site {
     await timeout(250) // all we are saying...is give paint a chance
     console.log('running. isMobileDevice=', isMobile())
     if ($('#game-canvas-wrapper')) {
-      if (isMobile()) $('.phone-warning').style.display = ''
       this.loadGame()
     }
   }
@@ -22,6 +21,7 @@ class Site {
     const btnEraseStorage = $('#btn-erase-storage')
     btnEraseStorage?.addEventListener('click', () => this.eraseLocalStorage())
     window.addEventListener('keydown', (e: KeyboardEvent) => this.keyDown(e))
+    window.addEventListener('touchend', (e: TouchEvent) => this.endTouch(e))
   }
   private eraseLocalStorage() {
     if (confirm('Are you sure? This will clear your game stats.')) {
@@ -49,6 +49,10 @@ class Site {
   }
   private keyDown(e: KeyboardEvent) {
     if (e.key === ' ') this.launchGame()
+  }
+  private endTouch(e: TouchEvent) {
+    console.log(e)
+    this.launchGame()
   }
 }
 export {Site}

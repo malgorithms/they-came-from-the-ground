@@ -75,6 +75,14 @@ export default {
   courtWidth,
   twoPlayerControls,
   onePlayerControls,
+  touch: {
+    flickMinDistPx: 30,
+    flickMinMs: 20,
+    flickMaxMs: 10000,
+    tapMaxMs: 100,
+    tapMaxDist: 20,
+    xMoveMult: 10,
+  },
   physics: {
     ballPlayerElasticity: 0.95,
     ballAngularFriction: 0.5,

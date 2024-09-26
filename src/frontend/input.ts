@@ -3,13 +3,17 @@ import {GamepadConnectSummary, GamepadMonitor, TriggerName} from './gamepad-moni
 import {KeyboardMonitor} from './keyboard-monitor'
 import {MenuOwnership} from './menu'
 import {PlayerSpecies} from './player'
+import {ScreenSide, TouchDeviceMonitor, TouchMoveDelta} from './touch-device-monitor'
 import tweakables from './tweakables'
 import {MenuSelectResult, PlayerSide, Vector2} from './types'
+import {vec} from './utils'
 
 class Input {
   private pads = new GamepadMonitor()
   private keyboard = new KeyboardMonitor()
+  private touch = new TouchDeviceMonitor()
   private game: Game
+  private _isPlayingWithTouch = false
 
   public constructor(game: Game) {
     this.game = game
@@ -17,8 +21,11 @@ class Input {
   public updateInputStates(): void {
     this.keyboard.update()
     this.pads.update()
+    this.touch.update()
   }
-
+  public get isPlayingWithTouch() {
+    return this._isPlayingWithTouch
+  }
   public isKeyboardConnected(): boolean {
     return true // for now
   }
@@ -47,7 +54,10 @@ class Input {
       byPlayerSide: null,
       byKeyboard: false,
     }
-    if (this.keyboard.anyKeysJustPushed(['Enter', 'Space'])) {
+    if (this.touch.wasScreenJustTapped()) {
+      res.selected = true
+      res.byKeyboard = true
+    } else if (this.keyboard.anyKeysJustPushed(['Enter', 'Space'])) {
       res.selected = true
       res.byKeyboard = true
     } else {
@@ -121,11 +131,30 @@ class Input {
     const set = this.getKeyboardSet(pI)
     return this.keyboard.anyKeyDown(set.dash) || this.pads.anyButtonDown(pI, ['psSquare'])
   }
-
   public isJumpPressed(pI: PlayerSide): boolean {
     const set = this.getKeyboardSet(pI)
     return this.keyboard.anyKeyDown(set.jump) || this.pads.anyButtonDown(pI, ['psX'])
   }
+  public didJumpViaTouch(): boolean {
+    const res = !!this.touch.anyTap(ScreenSide.Right)
+    this._isPlayingWithTouch ||= res
+    return res
+  }
+  public getTouchThumbstickX(): number {
+    const t = this.touch.anyDragMovement(ScreenSide.Left)
+    if (!t) return 0
+    else {
+      this._isPlayingWithTouch = true
+      const x = t.vAsScreenFrac.x * tweakables.touch.xMoveMult
+      return Math.max(-1, Math.min(1, x))
+    }
+  }
+  /*
+  public isPulledBackTouch(): TouchMoveDelta | false {
+    const res = this.touch.isPulledBack()
+    if (res) this._isPlayingWithTouch = true
+    return res
+  }*/
   /**
    * returns 0 if trigger near 0, within tolerance
    * defined in tweakables. otherwise returns value up to 1

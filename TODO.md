@@ -2,6 +2,14 @@
 
 Stuff
 
+- mobile exploration:
+
+  - gameplay can actually be ok on iOS?
+  - canvas fill fix
+  - redo the menu for touch :-(
+  - test on smaller ios + ipad
+  - check this page: https://medium.com/appscope/designing-native-like-progressive-web-apps-for-ios-1b3cdda1d0e8
+
 - sharing idea: shareable stats page powered with some persistence / random playerid
 - bowling beast 8-ball character
 - more characters?

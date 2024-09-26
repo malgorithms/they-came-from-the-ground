@@ -2,15 +2,6 @@
 
 <div id="game-load-wrapper">
 
-  <!-- only visible on smaller viewports-->
-  <div style="display:none;" class="phone-warning">
-    ⚠️<br>
-    <b>Tippy Coco</b> is for computers, not phones or tablets. An <b>iPad</b> works with one of 
-    those folding keyboards, but that's it. It will not play on phones.
-    </p>
-  </div>
-
-
   <div class="intro-note">
     <div style="text-align:center">
       <img src="/images/site/cover.png" class="img-fluid">

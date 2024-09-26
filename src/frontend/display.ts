@@ -252,17 +252,8 @@ class Display {
       this.drawPlayerShadowBehind(playerRight)
 
       this.drawKapows(kapowManager)
-
       for (const player of [this.game.playerLeft, this.game.playerRight]) {
-        let closestBall = this.game.balls[0]
-        let closestDistance = Infinity
-        for (const ball of this.game.balls) {
-          const distance = vec.lenSq(vec.sub(ball.physics.center, player.physics.center))
-          if (distance < closestDistance) {
-            closestDistance = distance
-            closestBall = ball
-          }
-        }
+        const closestBall = this.game.getClosestBall(player.physics.center)
         this.drawPlayer(gameTime, player, closestBall)
       }
       this.game.balls.forEach((b) => this.drawBall(b))

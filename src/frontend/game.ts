@@ -416,19 +416,33 @@ class Game {
     const player = this.player(playerSide)
 
     if (player.species === PlayerSpecies.Human) {
-      player.targetXVel = player.isDashing ? player.physics.vel.x : 0
+      if (this.input.isPlayingWithTouch) {
+        if (player.isInJumpPosition) player.targetXVel = 0
+        else player.targetXVel = player.physics.vel.x
+      } else {
+        player.targetXVel = player.isDashing ? player.physics.vel.x : 0
+      }
       // the following is -1...1 and maps to 0 if near the center, as determined
       // in tweakables.thumbstickCenterTolerance
       const thumbstickPos = this.input.getLeftThumbStickX(playerSide)
+      const touchMoveX = this.input.getTouchThumbstickX()
       if (!player.isDashing) {
         if (this.input.isLeftPressed(playerSide)) player.moveLeft()
         else if (this.input.isRightPressed(playerSide)) player.moveRight()
         else if (thumbstickPos) player.moveRationally(thumbstickPos)
+        else if (touchMoveX) player.moveRationally(touchMoveX)
         if (player.canDashNow && this.input.wasDashJustPushed(playerSide)) {
           const dashDir = this.getDashDir(player)
           player.dash(dashDir)
           this.sound.play('dash', 1, 0, 0, false)
-        } else if (player.isInJumpPosition && this.input.isJumpPressed(playerSide)) player.jump()
+        } else if (player.isInJumpPosition) {
+          if (this.input.isJumpPressed(playerSide)) player.jump()
+          else if (this.input.didJumpViaTouch()) {
+            const b = this.getClosestBall(player.physics.center)
+            const dir = vec.normalized(vec.sub(b.physics.center, player.physics.center))
+            player.jumpTowards(dir)
+          }
+        }
       }
       // triggers only register over some threshold as dtermined in tweakables.triggerTolerance
       const lTrigger = this.input.getTrigger(playerSide, 'left')
@@ -607,6 +621,19 @@ class Game {
       }
       this.whoseServe = PlayerSide.Right
     }
+  }
+
+  public getClosestBall(p: Vector2): Ball {
+    let closestBall = this.balls[0]
+    let closestDSq = Infinity
+    for (const ball of this.balls) {
+      const dSq = vec.lenSq(vec.sub(ball.physics.center, p))
+      if (dSq < closestDSq) {
+        closestDSq = dSq
+        closestBall = ball
+      }
+    }
+    return closestBall
   }
 
   // keeps balls within the flowers; this is a simple/fast solution
